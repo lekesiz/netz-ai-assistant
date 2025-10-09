@@ -1,185 +1,235 @@
 # NETZ AI Assistant - Enterprise Offline AI System
 
 ## 🚀 Overview
-A fully offline, enterprise-grade AI assistant designed for NETZ Informatique, featuring company-specific knowledge and secure multi-user access.
+An intelligent offline AI assistant for NETZ Informatique, providing real-time business insights, financial data analysis, and document management capabilities with multilingual support (French, Turkish, English).
 
 ## 📋 Key Features
-- ✅ Completely offline operation (air-gapped deployment)
-- ✅ French-optimized AI models
-- ✅ Google Workspace integration (Drive, Gmail, Calendar)
-- ✅ Secure multi-user access control
-- ✅ Automatic data updates and model training
-- ✅ Enterprise-grade security and monitoring
+- ✅ **Multilingual Chat Interface** (French, Turkish, English)
+- ✅ **Real-time Financial Data** from PennyLane integration
+- ✅ **Document Upload & Processing** (PDF, Word, Excel, TXT, CSV)
+- ✅ **Vector Search** with Qdrant database
+- ✅ **RAG (Retrieval Augmented Generation)** for accurate responses
+- ✅ **Offline-first Architecture** for data security
+- ✅ **Web-based Interface** with modern UI
 
-## 🏗️ System Architecture
+## 🏗️ Current Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Web Client    │────▶│  Kong Gateway   │────▶│   FastAPI       │
-└─────────────────┘     └─────────────────┘     └────────┬────────┘
-                                                          │
-                        ┌─────────────────────────────────┴────────┐
-                        │                                          │
-                  ┌─────┴─────┐  ┌──────────────┐  ┌─────────────┴───┐
-                  │   vLLM    │  │    Qdrant    │  │   PostgreSQL    │
-                  │  Server   │  │  Vector DB   │  │    Database     │
-                  └───────────┘  └──────────────┘  └─────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌──────────────────┐
+│  Next.js 14     │────▶│  Simple API     │────▶│    Ollama        │
+│  Frontend       │     │  (Port 8001)   │     │    (Mistral)     │
+└─────────────────┘     └─────────────────┘     └──────────────────┘
+                              │
+┌─────────────────┐           │                  ┌──────────────────┐
+│  Document       │────▶│  Upload API     │────▶│  Knowledge Base  │
+│  Management     │     │  (Port 8002)   │     │  (JSON Storage)  │
+└─────────────────┘     └─────────────────┘     └──────────────────┘
+
+Additional Services:
+├── Qdrant Vector DB (Port 6333)
+├── PostgreSQL Database (Port 5432)
+└── Redis Cache (Port 6379)
 ```
 
 ## 📦 Project Structure
 
 ```
 NETZ-AI-Project/
-├── documents/          # Detailed documentation
-│   ├── 01-Donanim-Gereksinimleri.md
-│   ├── 02-Yazilim-Stack-Teknoloji-Secimi.md
-│   ├── 03-LLM-Model-Secimi-Kurulum.md
-│   ├── 04-Veri-Toplama-Egitim-Plani.md
-│   └── 05-Guvenlik-Erisim-Kontrolu.md
-├── scripts/           # Installation and management scripts
-│   ├── install.sh     # Main installation script
-│   └── backup.sh      # Backup automation
-├── configs/           # Configuration files
-│   ├── docker-compose.yml
-│   └── .env.template
-├── services/          # Systemd service files
-│   ├── netz-llm.service
-│   └── netz-api.service
-├── data/             # Data directories (empty)
-├── models/           # Model directories (empty)
-└── training/         # Training scripts (coming soon)
+├── backend/
+│   ├── simple_api.py          # Main chat API (Port 8001)
+│   ├── document_upload_api.py # Document upload service (Port 8002)
+│   ├── main.py               # Full RAG implementation
+│   ├── rag_service.py        # RAG service
+│   ├── load_complete_data.py # Data loading script
+│   └── requirements.txt      # Python dependencies
+├── frontend/
+│   ├── app/
+│   │   ├── page.tsx          # Home page
+│   │   ├── chat/page.tsx     # Chat interface
+│   │   └── documents/page.tsx # Document upload
+│   ├── components/
+│   │   ├── DocumentUpload.tsx # Upload component
+│   │   └── chat/             # Chat components
+│   └── package.json          # Node dependencies
+├── docker-compose.yml        # Docker services
+├── .env.example             # Environment template
+└── README.md                # This file
 ```
 
 ## 🚀 Quick Start
 
-### 1. System Requirements
-- Ubuntu Server 22.04 LTS
-- Minimum 64GB RAM
-- NVIDIA GPU (RTX 4070 Ti or higher)
-- 2TB+ storage space
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Docker & Docker Compose
+- 8GB+ RAM (16GB recommended)
+- macOS/Linux/Windows with WSL2
 
-### 2. Installation
+### Installation
 
+1. **Clone the repository**
 ```bash
-# Clone the repository
 git clone https://github.com/lekesiz/netz-ai-assistant.git
 cd netz-ai-assistant
-
-# Run the installation script
-sudo bash scripts/install.sh
 ```
 
-### 3. Configuration
-
+2. **Install backend dependencies**
 ```bash
-# Create environment file
-cp configs/.env.template /etc/netz-ai/.env
-
-# Edit configuration
-sudo nano /etc/netz-ai/.env
+cd backend
+pip install -r requirements.txt
 ```
 
-### 4. Start Services
-
+3. **Install frontend dependencies**
 ```bash
-# Start all services
-sudo systemctl start netz-llm
-sudo systemctl start netz-api
-sudo systemctl start netz-worker
-
-# Check status
-sudo systemctl status netz-*
+cd ../frontend
+npm install
 ```
 
-## 🔐 Initial Access
-
-1. Navigate to: `https://netz-ai.local`
-2. Login with admin credentials
-3. Change default passwords
-4. Configure users and roles
-
-## 📊 Monitoring
-
-- Grafana: `http://localhost:3001` (admin/CHANGE_ME)
-- Prometheus: `http://localhost:9090`
-- Keycloak: `http://localhost:8080` (admin/CHANGE_ME)
-
-## 🔧 Management Commands
-
+4. **Start Docker services**
 ```bash
-# Create backup
-sudo /opt/netz-ai/scripts/backup.sh
-
-# View logs
-sudo journalctl -u netz-api -f
-
-# Update model
-sudo -u netz-ai /opt/netz-ai/scripts/update-model.sh
-
-# System health check
-sudo /opt/netz-ai/scripts/health-check.sh
+cd ..
+docker-compose up -d
 ```
 
-## 📚 Detailed Documentation
-
-Comprehensive documentation for each topic is available in the `documents/` folder:
-
-1. **Hardware Requirements**: Minimum, recommended, and enterprise configurations
-2. **Software Stack**: Technologies and architecture details
-3. **Model Selection**: LLM models and installation guide
-4. **Data Collection**: Google Workspace integration and training process
-5. **Security**: Access control, encryption, and security policies
-
-## 🛡️ Security Notes
-
-- Change all default passwords immediately
-- Review and configure firewall rules
-- Update SSL certificates for production
-- Implement regular backup schedule
-- Monitor audit logs continuously
-
-## 🆘 Troubleshooting
-
-### GPU Not Detected
+5. **Install Ollama and Mistral model**
 ```bash
-nvidia-smi
-# CUDA driver installation may be required
+# macOS/Linux
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull Mistral model
+ollama pull mistral
 ```
 
-### Model Loading Error
+### Running the Application
+
+1. **Start backend services**
 ```bash
-# Check model files
-ls -la /opt/netz-ai/models/
+cd backend
+# Main chat API
+python simple_api.py &
+
+# Document upload API  
+python document_upload_api.py &
 ```
 
-### API Connection Issues
+2. **Start frontend**
 ```bash
-# Check service status
-sudo systemctl status netz-api
-# Review logs
-sudo journalctl -u netz-api -n 100
+cd ../frontend
+npm run dev
 ```
 
-## 👤 Author
+3. **Access the application**
+- Main Interface: http://localhost:3000 (or 3001)
+- Chat: http://localhost:3000/chat
+- Document Upload: http://localhost:3000/documents
 
-**Mikail Lekesiz**  
-NETZ Informatique
+## 📋 Usage Guide
 
-## 📧 Contact
+### Chat Interface
+- Ask questions in French, Turkish, or English
+- Get real-time business insights
+- Financial data queries
+- Training program information
 
-**NETZ Informatique**  
-- Email: contact@netzinformatique.fr  
-- Phone: +33 3 67 31 02 01  
-- Website: [netzinformatique.fr](https://netzinformatique.fr)
+### Document Upload
+1. Navigate to Documents page
+2. Drag & drop or select files
+3. Supported formats: PDF, Word, Excel, TXT, CSV
+4. Documents are automatically processed and added to AI knowledge base
 
-## 📄 License
+### Example Queries
+- "Quel est le chiffre d'affaires d'octobre 2025?"
+- "Quelle formation rapporte le plus?"
+- "Ekim ayı ciromuz nedir?"
+- "How many active clients do we have?"
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📊 Current Company Data (2025)
 
-## 🔒 Confidentiality
+### Financial Overview
+- **January-October Revenue**: €119,386.85
+- **October Revenue**: €41,558.85 (highest month)
+- **Annual Projection**: €143,264.22
+- **Active Clients**: 2,734
 
-This project contains proprietary information of NETZ Informatique. Please handle with appropriate confidentiality.
+### Top Training Programs by Revenue
+1. **Excel**: €35,815.85 (30%)
+2. **Skills Assessment**: €28,500 (23.9%)
+3. **Python**: €19,000 (15.9%)
+4. **AutoCAD**: €13,058.85 (10.9%)
+5. **WordPress**: €11,264 (9.4%)
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**backend/.env**
+```env
+DATABASE_URL=postgresql://user:pass@localhost:5432/netz_ai
+REDIS_URL=redis://localhost:6379
+QDRANT_URL=http://localhost:6333
+PENNYLANE_API_KEY=your_pennylane_key
+OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_key
+```
+
+**frontend/.env.local**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8001
+NEXT_PUBLIC_UPLOAD_API_URL=http://localhost:8002
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Port conflicts**
+   - Frontend may use port 3001 if 3000 is busy
+   - Update `.env.local` accordingly
+
+2. **AI responds in wrong language**
+   - Specify language in query: "Réponds en turc: ..."
+   - Model defaults to French
+
+3. **Document upload fails**
+   - Check file size (<10MB)
+   - Ensure upload API is running on port 8002
+
+4. **Slow responses**
+   - Check if Ollama is running: `ollama list`
+   - Ensure adequate RAM available
+
+## 🚀 Upcoming Features
+
+- [ ] Google Drive automatic sync
+- [ ] Gmail integration
+- [ ] Real-time PennyLane webhooks
+- [ ] Voice chat interface
+- [ ] Mobile app
+- [ ] Advanced analytics dashboard
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## 📝 License
+
+This project is proprietary software for NETZ Informatique.
+
+## 📞 Support
+
+- **Email**: mikail@netzinformatique.fr
+- **Company**: NETZ INFORMATIQUE
+- **SIRET**: 818 347 346 00020
+- **Address**: 1A Route de Schweighouse, 67500 HAGUENAU, France
+- **Phone**: +33 3 67 31 02 01
+- **Website**: [netzinformatique.fr](https://netzinformatique.fr)
 
 ---
-*Created by Mikail Lekesiz*  
-*Last updated: 2025-01-09*
+
+**NETZ INFORMATIQUE** - Excellence in IT Training & Consulting Since 2015
+
+*Last updated: January 9, 2025*

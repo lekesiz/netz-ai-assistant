@@ -131,6 +131,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Frontend specific
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Backend specific
+backend/uploaded_documents/
+backend/processed_documents/
+backend/*.json
+backend/simple_api_kb.json
+
+# Qdrant storage
+qdrant_storage/
+
 # Coverage reports
 htmlcov/
 .coverage
