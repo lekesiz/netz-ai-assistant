@@ -1,17 +1,17 @@
-# NETZ Informatique AI System
+# NETZ AI Assistant - Enterprise Offline AI System
 
-## 🚀 Özet
-NETZ Informatique için tamamen offline çalışan, şirket özel bilgilerine sahip kurumsal AI asistanı.
+## 🚀 Overview
+A fully offline, enterprise-grade AI assistant designed for NETZ Informatique, featuring company-specific knowledge and secure multi-user access.
 
-## 📋 Özellikler
-- ✅ Tamamen offline çalışma (air-gapped deployment)
-- ✅ Fransızca optimize edilmiş AI modeller
-- ✅ Google Workspace entegrasyonu (Drive, Gmail, Calendar)
-- ✅ Güvenli multi-user erişim kontrolü
-- ✅ Otomatik veri güncelleme ve model eğitimi
-- ✅ Enterprise-grade güvenlik ve monitoring
+## 📋 Key Features
+- ✅ Completely offline operation (air-gapped deployment)
+- ✅ French-optimized AI models
+- ✅ Google Workspace integration (Drive, Gmail, Calendar)
+- ✅ Secure multi-user access control
+- ✅ Automatic data updates and model training
+- ✅ Enterprise-grade security and monitoring
 
-## 🏗️ Sistem Mimarisi
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -26,77 +26,77 @@ NETZ Informatique için tamamen offline çalışan, şirket özel bilgilerine sa
                   └───────────┘  └──────────────┘  └─────────────────┘
 ```
 
-## 📦 Proje Yapısı
+## 📦 Project Structure
 
 ```
 NETZ-AI-Project/
-├── documents/          # Detaylı dokümantasyon
+├── documents/          # Detailed documentation
 │   ├── 01-Donanim-Gereksinimleri.md
 │   ├── 02-Yazilim-Stack-Teknoloji-Secimi.md
 │   ├── 03-LLM-Model-Secimi-Kurulum.md
 │   ├── 04-Veri-Toplama-Egitim-Plani.md
 │   └── 05-Guvenlik-Erisim-Kontrolu.md
-├── scripts/           # Kurulum ve yönetim scriptleri
-│   ├── install.sh     # Ana kurulum scripti
-│   └── backup.sh      # Yedekleme scripti
-├── configs/           # Konfigürasyon dosyaları
+├── scripts/           # Installation and management scripts
+│   ├── install.sh     # Main installation script
+│   └── backup.sh      # Backup automation
+├── configs/           # Configuration files
 │   ├── docker-compose.yml
 │   └── .env.template
-├── services/          # Systemd service dosyaları
+├── services/          # Systemd service files
 │   ├── netz-llm.service
 │   └── netz-api.service
-├── data/             # Veri dizinleri (boş)
-├── models/           # Model dizinleri (boş)
-└── training/         # Eğitim scriptleri (gelecek)
+├── data/             # Data directories (empty)
+├── models/           # Model directories (empty)
+└── training/         # Training scripts (coming soon)
 ```
 
-## 🚀 Hızlı Başlangıç
+## 🚀 Quick Start
 
-### 1. Sistem Gereksinimleri
+### 1. System Requirements
 - Ubuntu Server 22.04 LTS
 - Minimum 64GB RAM
-- NVIDIA GPU (RTX 4070 Ti veya üzeri)
-- 2TB+ depolama alanı
+- NVIDIA GPU (RTX 4070 Ti or higher)
+- 2TB+ storage space
 
-### 2. Kurulum
+### 2. Installation
 
 ```bash
-# Repository'yi klonla
-git clone https://github.com/netz-informatique/netz-ai.git
-cd netz-ai
+# Clone the repository
+git clone https://github.com/lekesiz/netz-ai-assistant.git
+cd netz-ai-assistant
 
-# Kurulum scriptini çalıştır
+# Run the installation script
 sudo bash scripts/install.sh
 ```
 
-### 3. Konfigürasyon
+### 3. Configuration
 
 ```bash
-# Environment dosyasını oluştur
+# Create environment file
 cp configs/.env.template /etc/netz-ai/.env
 
-# Değerleri düzenle
+# Edit configuration
 sudo nano /etc/netz-ai/.env
 ```
 
-### 4. Servisleri Başlat
+### 4. Start Services
 
 ```bash
-# Tüm servisleri başlat
+# Start all services
 sudo systemctl start netz-llm
 sudo systemctl start netz-api
 sudo systemctl start netz-worker
 
-# Durumu kontrol et
+# Check status
 sudo systemctl status netz-*
 ```
 
-## 🔐 İlk Giriş
+## 🔐 Initial Access
 
-1. Web arayüzüne gidin: `https://netz-ai.local`
-2. Admin kullanıcısı ile giriş yapın
-3. Şifreleri değiştirin
-4. Kullanıcıları ve rolleri yapılandırın
+1. Navigate to: `https://netz-ai.local`
+2. Login with admin credentials
+3. Change default passwords
+4. Configure users and roles
 
 ## 📊 Monitoring
 
@@ -104,71 +104,82 @@ sudo systemctl status netz-*
 - Prometheus: `http://localhost:9090`
 - Keycloak: `http://localhost:8080` (admin/CHANGE_ME)
 
-## 🔧 Yönetim Komutları
+## 🔧 Management Commands
 
 ```bash
-# Backup al
+# Create backup
 sudo /opt/netz-ai/scripts/backup.sh
 
-# Logları görüntüle
+# View logs
 sudo journalctl -u netz-api -f
 
-# Model güncelle
+# Update model
 sudo -u netz-ai /opt/netz-ai/scripts/update-model.sh
 
-# Sistem durumu
+# System health check
 sudo /opt/netz-ai/scripts/health-check.sh
 ```
 
-## 📚 Detaylı Dokümantasyon
+## 📚 Detailed Documentation
 
-Her konu için detaylı dokümantasyon `documents/` klasöründe bulunmaktadır:
+Comprehensive documentation for each topic is available in the `documents/` folder:
 
-1. **Donanım Gereksinimleri**: Minimum, önerilen ve enterprise konfigürasyonlar
-2. **Yazılım Stack**: Kullanılan teknolojiler ve mimarisi
-3. **Model Seçimi**: LLM modelleri ve kurulum detayları
-4. **Veri Toplama**: Google Workspace entegrasyonu ve eğitim süreci
-5. **Güvenlik**: Erişim kontrolü, şifreleme ve güvenlik politikaları
+1. **Hardware Requirements**: Minimum, recommended, and enterprise configurations
+2. **Software Stack**: Technologies and architecture details
+3. **Model Selection**: LLM models and installation guide
+4. **Data Collection**: Google Workspace integration and training process
+5. **Security**: Access control, encryption, and security policies
 
-## 🛡️ Güvenlik Notları
+## 🛡️ Security Notes
 
-- Tüm default şifreleri değiştirin
-- Firewall kurallarını kontrol edin
-- SSL sertifikalarını production için güncelleyin
-- Düzenli backup alın
-- Audit loglarını monitör edin
+- Change all default passwords immediately
+- Review and configure firewall rules
+- Update SSL certificates for production
+- Implement regular backup schedule
+- Monitor audit logs continuously
 
-## 🆘 Sorun Giderme
+## 🆘 Troubleshooting
 
-### GPU Tanınmıyor
+### GPU Not Detected
 ```bash
 nvidia-smi
-# CUDA driver kurulumu gerekebilir
+# CUDA driver installation may be required
 ```
 
-### Model Yükleme Hatası
+### Model Loading Error
 ```bash
-# Model dosyalarını kontrol et
+# Check model files
 ls -la /opt/netz-ai/models/
 ```
 
-### API Bağlantı Hatası
+### API Connection Issues
 ```bash
-# Service durumunu kontrol et
+# Check service status
 sudo systemctl status netz-api
-# Logları incele
+# Review logs
 sudo journalctl -u netz-api -n 100
 ```
 
-## 📧 İletişim
+## 👤 Author
 
-NETZ Informatique  
-Email: support@netz-informatique.fr  
-Tel: +33 X XX XX XX XX
+**Mikail Lekesiz**  
+NETZ Informatique
 
-## 📄 Lisans
+## 📧 Contact
 
-Bu proje NETZ Informatique'e özeldir ve gizlilik sözleşmesi kapsamındadır.
+**NETZ Informatique**  
+- Email: contact@netzinformatique.fr  
+- Phone: +33 3 67 31 02 01  
+- Website: [netzinformatique.fr](https://netzinformatique.fr)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔒 Confidentiality
+
+This project contains proprietary information of NETZ Informatique. Please handle with appropriate confidentiality.
 
 ---
-*Son güncelleme: 2025-01-09*
+*Created by Mikail Lekesiz*  
+*Last updated: 2025-01-09*
