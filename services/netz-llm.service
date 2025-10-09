@@ -1,0 +1,52 @@
+[Unit]
+Description=NETZ AI LLM Server
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=netz-ai
+Group=netz-ai
+WorkingDirectory=/opt/netz-ai
+Environment="PATH=/opt/netz-ai/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="CUDA_VISIBLE_DEVICES=0"
+
+# Pre-start checks
+ExecStartPre=/bin/bash -c 'nvidia-smi || (echo "GPU not available" && exit 1)'
+ExecStartPre=/bin/bash -c 'test -d /opt/netz-ai/models/mistral-7b-instruct-v0.2 || (echo "Model not found" && exit 1)'
+
+# Main service
+ExecStart=/opt/netz-ai/venv/bin/python -m vllm.entrypoints.openai.api_server \
+    --model /opt/netz-ai/models/mistral-7b-instruct-v0.2 \
+    --host 0.0.0.0 \
+    --port 8888 \
+    --max-model-len 8192 \
+    --gpu-memory-utilization 0.9 \
+    --dtype half \
+    --trust-remote-code \
+    --api-key ${VLLM_API_KEY}
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/netz-ai /var/log/netz-ai
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=netz-llm
+
+[Install]
+WantedBy=multi-user.target

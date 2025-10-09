@@ -1,0 +1,53 @@
+[Unit]
+Description=NETZ AI API Server
+After=network.target postgresql.service redis.service netz-llm.service
+Wants=postgresql.service redis.service netz-llm.service
+
+[Service]
+Type=simple
+User=netz-ai
+Group=netz-ai
+WorkingDirectory=/opt/netz-ai/api
+Environment="PATH=/opt/netz-ai/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/netz-ai/api"
+
+# Load environment variables
+EnvironmentFile=/etc/netz-ai/.env
+
+# Pre-start database migrations
+ExecStartPre=/opt/netz-ai/venv/bin/alembic upgrade head
+
+# Main service
+ExecStart=/opt/netz-ai/venv/bin/uvicorn main:app \
+    --host 0.0.0.0 \
+    --port 8002 \
+    --workers 4 \
+    --loop uvloop \
+    --log-level info \
+    --access-log \
+    --use-colors
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/netz-ai /var/log/netz-ai /var/lib/netz-ai
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=netz-api
+
+[Install]
+WantedBy=multi-user.target
