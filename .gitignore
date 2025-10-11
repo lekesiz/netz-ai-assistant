@@ -198,4 +198,4 @@ $RECYCLE.BIN/
 *.msix
 *.msm
 *.msp
-*.lnk
+*.lnkvenv_mac/

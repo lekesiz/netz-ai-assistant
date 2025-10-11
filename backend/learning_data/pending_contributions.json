@@ -1,0 +1,25 @@
+[
+  {
+    "id": "14fea095a07e",
+    "user_id": "user-test-001",
+    "session_id": "test-session-123",
+    "timestamp": "2025-10-10 08:53:31.910799",
+    "original_query": "What is the current revenue of NETZ INFORMATIQUE?",
+    "user_statement": "This is correct and helpful. The revenue information matches our records.",
+    "context": {
+      "ai_response": "The total revenue for NETZ INFORMATIQUE in 2025 is \u20ac143,264.22",
+      "conversation_timestamp": "2025-10-10T08:53:31.910776"
+    },
+    "knowledge_type": "fact",
+    "language": "en",
+    "confidence_score": 0.5,
+    "tags": [],
+    "status": "pending",
+    "reviewed_by": null,
+    "review_timestamp": null,
+    "review_notes": null,
+    "approved_content": null,
+    "category": null,
+    "priority": 5
+  }
+]

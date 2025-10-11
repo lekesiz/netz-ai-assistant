@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETZ AI Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+        
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .ai-message {
+            background: #f1f3f4;
+            color: #333;
+        }
+        
+        .model-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .input-area button {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .input-area button:hover {
+            background: #0056b3;
+        }
+        
+        .input-area button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .model-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .model-option {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .model-option:hover {
+            border-color: #007bff;
+        }
+        
+        .model-option.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .info-panel {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 NETZ AI Assistant Test Interface</h1>
+        
+        <div class="info-panel">
+            <h3>Model Seçenekleri</h3>
+            <div class="model-selector">
+                <div class="model-option selected" data-preference="">
+                    🤖 Otomatik
+                </div>
+                <div class="model-option" data-preference="fast">
+                    ⚡ Hızlı (Llama 3.2)
+                </div>
+                <div class="model-option" data-preference="general">
+                    💬 Genel (Mistral 7B)
+                </div>
+                <div class="model-option" data-preference="coding">
+                    💻 Kod (Qwen Coder)
+                </div>
+                <div class="model-option" data-preference="accurate">
+                    🎯 Detaylı (Qwen 72B)
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="messageCount">0</div>
+                    <div class="stat-label">Mesaj</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="avgResponseTime">0s</div>
+                    <div class="stat-label">Ort. Yanıt</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="currentModel">-</div>
+                    <div class="stat-label">Model</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message ai-message">
+                    👋 Merhaba! Ben NETZ AI Assistant. Size nasıl yardımcı olabilirim?
+                    <div class="model-info">Model: Başlatılıyor...</div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Sorunuzu yazın..." 
+                    onkeypress="if(event.key === 'Enter') sendMessage()"
+                >
+                <button id="sendButton" onclick="sendMessage()">Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+        let selectedPreference = '';
+        let responseTimes = [];
+        let messageCount = 0;
+        
+        // Model seçimi
+        document.querySelectorAll('.model-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPreference = this.dataset.preference;
+            });
+        });
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesDiv = document.getElementById('messages');
+            const sendButton = document.getElementById('sendButton');
+            
+            // Kullanıcı mesajını ekle
+            messagesDiv.innerHTML += `
+                <div class="message user-message">${message}</div>
+            `;
+            
+            // Loading göster
+            const loadingId = Date.now();
+            messagesDiv.innerHTML += `
+                <div class="message ai-message loading" id="loading-${loadingId}">
+                    ⏳ Düşünüyorum...
+                </div>
+            `;
+            
+            input.value = '';
+            input.disabled = true;
+            sendButton.disabled = true;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            const startTime = Date.now();
+            
+            try {
+                const requestBody = {
+                    messages: [{ role: 'user', content: message }]
+                };
+                
+                if (selectedPreference) {
+                    requestBody.model_preference = selectedPreference;
+                }
+                
+                const response = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const data = await response.json();
+                const responseTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                
+                // Loading'i kaldır
+                const loadingDiv = document.getElementById(`loading-${loadingId}`);
+                if (loadingDiv) loadingDiv.remove();
+                
+                // AI yanıtını ekle
+                messagesDiv.innerHTML += `
+                    <div class="message ai-message">
+                        ${data.response.replace(/\n/g, '<br>')}
+                        <div class="model-info">
+                            Model: ${data.model_info?.name || data.model} | 
+                            Yanıt: ${responseTime}s |
+                            Tür: ${data.model_info?.type || 'auto'}
+                        </div>
+                    </div>
+                `;
+                
+                // İstatistikleri güncelle
+                messageCount++;
+                responseTimes.push(parseFloat(responseTime));
+                updateStats(data.model_info?.name || data.model);
+                
+            } catch (error) {
+                // Loading'i kaldır
+                const loadingDiv = document.getElementById(`loading-${loadingId}`);
+                if (loadingDiv) loadingDiv.remove();
+                
+                messagesDiv.innerHTML += `
+                    <div class="error">
+                        ❌ Hata: ${error.message}
+                    </div>
+                `;
+            }
+            
+            input.disabled = false;
+            sendButton.disabled = false;
+            input.focus();
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function updateStats(modelName) {
+            document.getElementById('messageCount').textContent = messageCount;
+            document.getElementById('currentModel').textContent = modelName.split(' ')[0];
+            
+            if (responseTimes.length > 0) {
+                const avg = (responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length).toFixed(1);
+                document.getElementById('avgResponseTime').textContent = avg + 's';
+            }
+        }
+        
+        // Test sorularını ekle
+        function addTestQuestions() {
+            const testQuestions = [
+                "NETZ Informatique hangi hizmetleri sunuyor?",
+                "Python'da async/await nasıl kullanılır?",
+                "Excel eğitimi kaç saat sürüyor ve fiyatı nedir?",
+                "Comment puis-je contacter NETZ?",
+                "What is the total revenue for 2025?"
+            ];
+            
+            const randomQuestion = testQuestions[Math.floor(Math.random() * testQuestions.length)];
+            document.getElementById('messageInput').placeholder = `Örnek: ${randomQuestion}`;
+        }
+        
+        // Model durumunu kontrol et
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/learning-status`);
+                const data = await response.json();
+                console.log('System status:', data);
+            } catch (error) {
+                console.error('Status check failed:', error);
+            }
+        }
+        
+        // Sayfa yüklendiğinde
+        addTestQuestions();
+        checkStatus();
+    </script>
+</body>
+</html>

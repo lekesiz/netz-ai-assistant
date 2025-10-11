@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  # NETZ AI API Service
+  netz-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: netz-ai-api
+    ports:
+      - "8000:8000"  # API port
+      - "9090:9090"  # Metrics port
+    environment:
+      - ENVIRONMENT=production
+      - OLLAMA_HOST=http://ollama:11434
+      - DATABASE_URL=postgresql://netzai:netzai@postgres:5432/netzai
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=netzai_redis_password
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+      - ./backups:/backups
+    depends_on:
+      - postgres
+      - redis
+      - ollama
+    networks:
+      - netzai-network
+    restart: unless-stopped
+
+  # Ollama Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: netz-ollama
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - netzai-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: netz-postgres
+    environment:
+      - POSTGRES_DB=netzai
+      - POSTGRES_USER=netzai
+      - POSTGRES_PASSWORD=netzai_db_password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - netzai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netzai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: netz-redis
+    command: redis-server --requirepass netzai_redis_password --appendonly yes
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - netzai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx Reverse Proxy (optional for production)
+  nginx:
+    image: nginx:alpine
+    container_name: netz-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - netz-api
+    networks:
+      - netzai-network
+    restart: unless-stopped
+
+  # Prometheus for monitoring (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: netz-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9091:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - netzai-network
+    restart: unless-stopped
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: netz-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=netzai_grafana_password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - netzai-network
+    restart: unless-stopped
+
+  # Jaeger for tracing (optional)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: netz-jaeger
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"  # UI
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    networks:
+      - netzai-network
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  netzai-network:
+    driver: bridge

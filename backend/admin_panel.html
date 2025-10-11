@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETZ AI - Admin Knowledge Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            text-align: center;
+            font-size: 28px;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-approve {
+            background: #27ae60;
+        }
+        
+        .btn-approve:hover {
+            background: #229954;
+        }
+        
+        .btn-reject {
+            background: #e74c3c;
+        }
+        
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .contributions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .contribution {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .contribution:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .contribution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .contribution-meta {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .contribution-content {
+            margin-bottom: 15px;
+        }
+        
+        .original-query {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .user-statement {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .contribution-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .edit-content {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            display: none;
+        }
+        
+        .category-select {
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .language-badge {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .type-badge {
+            background: #9b59b6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>NETZ AI Knowledge Management System</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginForm" class="login-form">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username" value="mikail">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn" onclick="login()">Login</button>
+            <div id="loginError" class="message error" style="display: none;"></div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <!-- Statistics -->
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Pending Review</h3>
+                    <div class="number" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Approved</h3>
+                    <div class="number" id="approvedCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Rejected</h3>
+                    <div class="number" id="rejectedCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Contributions</h3>
+                    <div class="number" id="totalCount">0</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <select id="statusFilter" onchange="loadContributions()">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <button class="btn" onclick="loadContributions()">Refresh</button>
+            </div>
+
+            <!-- Contributions List -->
+            <div class="contributions">
+                <h2>User Contributions</h2>
+                <div id="contributionsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8003';
+        let adminToken = localStorage.getItem('adminToken');
+
+        // Check if already logged in
+        if (adminToken) {
+            showDashboard();
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    adminToken = data.token;
+                    localStorage.setItem('adminToken', adminToken);
+                    showDashboard();
+                } else {
+                    document.getElementById('loginError').textContent = 'Invalid credentials';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadContributions();
+        }
+
+        async function loadContributions() {
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/contributions?status=${status}`, {
+                    headers: {
+                        'X-Admin-Token': adminToken
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayContributions(data);
+                    updateStats(data);
+                } else if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    location.reload();
+                }
+            } catch (error) {
+                alert('Failed to load contributions: ' + error.message);
+            }
+        }
+
+        function displayContributions(data) {
+            const container = document.getElementById('contributionsList');
+            container.innerHTML = '';
+            
+            if (data.contributions.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No contributions found</p>';
+                return;
+            }
+            
+            data.contributions.forEach(cont => {
+                const div = document.createElement('div');
+                div.className = 'contribution';
+                div.innerHTML = `
+                    <div class="contribution-header">
+                        <div>
+                            <span class="language-badge">${cont.language.toUpperCase()}</span>
+                            <span class="type-badge">${cont.knowledge_type}</span>
+                        </div>
+                        <div class="contribution-meta">
+                            ${new Date(cont.timestamp).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="contribution-content">
+                        <div class="original-query">
+                            <strong>Original Query:</strong> ${cont.original_query}
+                        </div>
+                        <div class="user-statement">
+                            <strong>User Statement:</strong> ${cont.user_statement}
+                        </div>
+                    </div>
+                    <textarea class="edit-content" id="edit-${cont.id}" placeholder="Edit content before approval...">${cont.user_statement}</textarea>
+                    <div class="contribution-actions">
+                        <button class="btn btn-approve" onclick="reviewContribution('${cont.id}', 'approve')">Approve</button>
+                        <button class="btn btn-reject" onclick="reviewContribution('${cont.id}', 'reject')">Reject</button>
+                        <button class="btn" onclick="toggleEdit('${cont.id}')">Edit</button>
+                        <select class="category-select" id="category-${cont.id}">
+                            <option value="">Select Category</option>
+                            <option value="technical">Technical</option>
+                            <option value="business">Business</option>
+                            <option value="training">Training</option>
+                            <option value="company">Company</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('pendingCount').textContent = data.pending;
+            document.getElementById('approvedCount').textContent = data.approved;
+            document.getElementById('rejectedCount').textContent = data.rejected;
+            document.getElementById('totalCount').textContent = data.total;
+        }
+
+        function toggleEdit(contId) {
+            const editField = document.getElementById(`edit-${contId}`);
+            editField.style.display = editField.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function reviewContribution(contId, action) {
+            const editField = document.getElementById(`edit-${contId}`);
+            const categoryField = document.getElementById(`category-${contId}`);
+            
+            const reviewData = {
+                contribution_id: contId,
+                action: action,
+                category: categoryField.value || 'general'
+            };
+            
+            // If editing and approving, include edited content
+            if (action === 'approve' && editField.style.display === 'block') {
+                reviewData.approved_content = editField.value;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': adminToken
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+                
+                if (response.ok) {
+                    alert(`Contribution ${action}ed successfully!`);
+                    loadContributions();
+                } else {
+                    const error = await response.json();
+                    alert('Review failed: ' + error.detail);
+                }
+            } catch (error) {
+                alert('Review failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

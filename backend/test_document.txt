@@ -1,0 +1,16 @@
+NETZ INFORMATIQUE - Test Belgesi
+
+Bu test belgesi AI hafızasının güncellenmesini test etmek içindir.
+
+Önemli Bilgiler:
+- 2025 yılı hedef ciro: 200,000€
+- Yeni eğitim: Yapay Zeka ve Machine Learning (AI/ML)
+- Hedef fiyat: 4,500€ (70 saat)
+- Tahmini talep: Ayda 2-3 kişi
+
+Notlar:
+- Bu eğitim 2025 Mart ayında başlayacak
+- Python bilgisi ön koşul olarak istenecek
+- Sertifika TOSA AI/ML olacak
+
+Test verisi sonu.

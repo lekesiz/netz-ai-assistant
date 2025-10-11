@@ -1,0 +1,21 @@
+{
+  "pennylane": {
+    "enabled": true,
+    "schedule": "daily",
+    "time": "02:00",
+    "description": "Mise à jour quotidienne des données comptables PennyLane"
+  },
+  "google_drive": {
+    "enabled": true,
+    "schedule": "daily",
+    "time": "03:00",
+    "description": "Mise à jour quotidienne des documents Google Drive"
+  },
+  "retention_days": 30,
+  "notifications": {
+    "enabled": false,
+    "email": "admin@netzinformatique.fr",
+    "on_success": false,
+    "on_failure": true
+  }
+}

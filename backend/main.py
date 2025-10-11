@@ -12,6 +12,7 @@ from rag_service import get_rag_service
 import ollama
 from pennylane_ingestion import PennyLaneIngestion
 from data_scheduler import get_scheduler
+from streaming_response import add_streaming_endpoints
 
 load_dotenv()
 
@@ -321,6 +322,9 @@ async def update_pennylane():
     except Exception as e:
         logger.error(f"PennyLane sync error: {str(e)}")
         return {"status": "error", "message": str(e)}
+
+# Add streaming endpoints
+add_streaming_endpoints(app)
 
 if __name__ == "__main__":
     import uvicorn
