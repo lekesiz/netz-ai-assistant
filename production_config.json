@@ -1,0 +1,56 @@
+{
+  "app": {
+    "name": "NETZ AI Production",
+    "version": "2.0.0",
+    "environment": "production",
+    "debug": false,
+    "reload": false
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8001,
+    "workers": 4,
+    "max_requests": 1000,
+    "max_requests_jitter": 50,
+    "timeout": 30,
+    "keepalive": 2
+  },
+  "database": {
+    "rag_storage_path": "./production_rag_storage",
+    "analytics_db": "./production_analytics.db",
+    "user_data_path": "./production_user_data",
+    "backup_retention_days": 30
+  },
+  "security": {
+    "cors_origins": [
+      "https://netzinformatique.fr",
+      "https://www.netzinformatique.fr",
+      "https://netz-ai.vercel.app"
+    ],
+    "rate_limit": {
+      "requests_per_minute": 60,
+      "burst_size": 10
+    },
+    "jwt_expiry_hours": 24,
+    "session_timeout_minutes": 480
+  },
+  "performance": {
+    "cache_size": 2000,
+    "cache_ttl_minutes": 60,
+    "max_concurrent_requests": 100,
+    "request_timeout": 30
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/netz-ai/app.log",
+    "max_file_size": "100MB",
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  "monitoring": {
+    "health_check_interval": 30,
+    "metrics_collection": true,
+    "alerts_enabled": true,
+    "performance_tracking": true
+  }
+}

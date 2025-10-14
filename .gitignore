@@ -198,4 +198,7 @@ $RECYCLE.BIN/
 *.msix
 *.msm
 *.msp
-*.lnkvenv_mac/
+*.lnk
+
+# Virtual environments
+venv_mac/

@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Paperclip, Mic, StopCircle } from 'lucide-react'
+import { Send, Paperclip, Mic, StopCircle, Shield, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { ChatMessage } from './chat-message'
 import { useChatStore } from '@/lib/store/chat-store'
+import { useAuth } from '@/lib/auth/auth-context'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { TypingIndicator } from '@/components/ui/typing-indicator'
 
@@ -17,6 +19,7 @@ export function ChatInterface() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   
   const { messages, sendMessage, currentConversation } = useChatStore()
+  const { isAuthenticated, user } = useAuth()
 
   useEffect(() => {
     // Scroll to bottom when new messages arrive
@@ -135,6 +138,25 @@ export function ChatInterface() {
       {/* Input Area */}
       <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-4">
+          {/* Authentication Status */}
+          <div className="flex items-center justify-center mb-3">
+            <Badge 
+              variant={isAuthenticated ? "default" : "secondary"} 
+              className="text-xs"
+            >
+              {isAuthenticated ? (
+                <>
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                  Mode sécurisé - {user?.full_name}
+                </>
+              ) : (
+                <>
+                  <Shield className="h-3 w-3 mr-1" />
+                  Mode invité
+                </>
+              )}
+            </Badge>
+          </div>
           <div className="flex items-end gap-2">
             <Button
               type="button"

@@ -1,0 +1,63 @@
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Create non-root user
+RUN groupadd -r netzai && useradd -r -g netzai netzai
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs && \
+    chown -R netzai:netzai /app
+
+# Install additional packages for production
+RUN pip install --no-cache-dir \
+    gunicorn \
+    uvicorn[standard] \
+    prometheus-client \
+    psutil
+
+# Health check
+COPY healthcheck.py .
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python healthcheck.py || exit 1
+
+# Switch to non-root user
+USER netzai
+
+# Expose port
+EXPOSE 8001
+
+# Production startup command
+CMD ["gunicorn", "working_api:app", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--workers", "4", \
+     "--bind", "0.0.0.0:8001", \
+     "--timeout", "120", \
+     "--keepalive", "2", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
+     "--preload", \
+     "--access-logfile", "/app/logs/access.log", \
+     "--error-logfile", "/app/logs/error.log", \
+     "--log-level", "info"]

@@ -1,0 +1,66 @@
+{
+  "KV8RX6hNqs6b7Erorh61_Q": {
+    "id": "KV8RX6hNqs6b7Erorh61_Q",
+    "username": "admin",
+    "email": "admin@netzinformatique.fr",
+    "password_hash": "$2b$12$C0/A5qCx/fPHDFR.qNxP/uaw9hmOvf70p.1mKDJdh3.6JN5FQr4zm",
+    "role": "admin",
+    "status": "active",
+    "created_at": "2025-10-12T14:40:01.870169",
+    "last_login": null,
+    "metadata": {},
+    "preferences": {
+      "theme": "light",
+      "language": "fr",
+      "notifications": true
+    }
+  },
+  "oNIUyXZfo6RHYi_solWT7Q": {
+    "id": "oNIUyXZfo6RHYi_solWT7Q",
+    "username": "testuser",
+    "email": "test@netzinformatique.fr",
+    "password_hash": "$2b$12$WPFODTJ2K3ZMIlovDyxNLuGGcjY3kHwYkGFfdMSbZWVEcUIsoc5aC",
+    "role": "user",
+    "status": "active",
+    "created_at": "2025-10-12T14:40:02.070169",
+    "last_login": "2025-10-12T14:40:02.265325",
+    "metadata": {},
+    "preferences": {
+      "theme": "light",
+      "language": "fr",
+      "notifications": true
+    }
+  },
+  "_3MISUTqoSnQuWYkUZw60Q": {
+    "id": "_3MISUTqoSnQuWYkUZw60Q",
+    "username": "test_integration_user",
+    "email": "test_integration@netzinformatique.fr",
+    "password_hash": "$2b$12$eX5ABGig4.e1nzK54Fu14.XCxmaLuLuVX6OAjwHT2Br2jdZhFFdLS",
+    "role": "user",
+    "status": "active",
+    "created_at": "2025-10-13T07:50:22.319170",
+    "last_login": "2025-10-13T07:50:22.504706",
+    "metadata": {},
+    "preferences": {
+      "theme": "light",
+      "language": "fr",
+      "notifications": true
+    }
+  },
+  "iIw_XVWPrUrlk38kXqCXDQ": {
+    "id": "iIw_XVWPrUrlk38kXqCXDQ",
+    "username": "integrity_test_user",
+    "email": "integrity@netzinformatique.fr",
+    "password_hash": "$2b$12$hAFldHBO.mqatduv0GOMM.fqWGyxrxjsAZNOLVB6Qlioni88MCh/K",
+    "role": "user",
+    "status": "active",
+    "created_at": "2025-10-13T07:50:26.236397",
+    "last_login": null,
+    "metadata": {},
+    "preferences": {
+      "theme": "light",
+      "language": "fr",
+      "notifications": true
+    }
+  }
+}

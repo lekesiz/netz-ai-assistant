@@ -22,10 +22,13 @@ transformers>=4.30.0
 watchdog==3.0.0
 schedule==1.2.0
 
-# Security
+# Security & Authentication
 PyJWT==2.8.0
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
 bleach==6.1.0
 slowapi==0.1.9
+email-validator==2.1.0
 
 # Additional
 rich==13.7.0

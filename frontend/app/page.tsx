@@ -90,6 +90,11 @@ export default function HomePage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Support: support@netzinformatique.fr | Tel: +33 3 67 31 02 01
           </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+            <a href="/admin" className="hover:text-blue-500 transition-colors">
+              Administration
+            </a>
+          </p>
         </div>
       </div>
     </div>

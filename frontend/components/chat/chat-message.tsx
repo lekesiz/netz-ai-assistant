@@ -9,7 +9,7 @@ import { fr } from 'date-fns/locale'
 
 interface Source {
   text: string
-  metadata: {
+  metadata?: {
     filename?: string
     source?: string
     type?: string
@@ -72,7 +72,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               <div key={idx} className="flex items-center gap-2 text-xs">
                 <FileText className="h-3 w-3 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  {source.metadata.filename || source.metadata.source || 'Document'}
+                  {source.metadata?.filename || source.metadata?.source || source.text?.slice(0, 30) + '...' || 'Document'}
                 </span>
                 <span className="text-muted-foreground">
                   ({(source.score * 100).toFixed(0)}% pertinent)
