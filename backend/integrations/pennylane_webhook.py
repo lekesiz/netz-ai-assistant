@@ -11,6 +11,7 @@ Features:
 - Error logging & retry mechanism
 """
 
+import os
 import hashlib
 import hmac
 import json
