@@ -48,6 +48,20 @@ try:
 except ImportError:
     ADVANCED_LEARNING_AVAILABLE = False
 
+# Import AI training system
+try:
+    from ai_training_api import add_training_routes
+    AI_TRAINING_AVAILABLE = True
+except ImportError:
+    AI_TRAINING_AVAILABLE = False
+
+# Import integrations API
+try:
+    from integrations_api import add_integrations_routes
+    INTEGRATIONS_API_AVAILABLE = True
+except ImportError:
+    INTEGRATIONS_API_AVAILABLE = False
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -232,55 +246,33 @@ NETZ_KB = {
 }
 
 def get_netz_response(user_message: str) -> str:
-    """Get contextual NETZ response based on user message"""
-    message_lower = user_message.lower()
+    """Get contextual NETZ response using optimized RAG system"""
     
-    # Greetings
-    if any(word in message_lower for word in ["bonjour", "salut", "hello", "hi"]):
-        return "Bonjour ! Je suis l'assistant IA de NETZ Informatique. Comment puis-je vous aider aujourd'hui ? Nous proposons dépannage, formation, maintenance et développement web."
+    # Use RAG system if available
+    if RAG_AVAILABLE and rag_system:
+        try:
+            # Search relevant content using RAG
+            rag_results = rag_system.search(user_message, k=3)
+            
+            if rag_results:
+                # Combine top results into context
+                context = " ".join([result["content"] for result in rag_results[:2]])
+                
+                # Return context-based response with specific NETZ info
+                if any(word in user_message.lower() for word in ["contact", "téléphone", "email"]):
+                    return f"Pour contacter NETZ Informatique : 📱 07 67 74 49 03, 📧 contact@netzinformatique.fr, 🌐 www.netzinformatique.fr. Situé à Haguenau 67500. {context[:200]}..."
+                elif any(word in user_message.lower() for word in ["tarif", "prix"]):
+                    return f"Tarifs NETZ Informatique 2025 : Dépannage 55€/h (particuliers), 75€/h (entreprises). Formations QUALIOPI 45€/h. Maintenance 39€/mois. Diagnostic GRATUIT. {context[:150]}..."
+                elif any(word in user_message.lower() for word in ["formation", "qualiopi"]):
+                    return f"NETZ propose des formations QUALIOPI : Excel, Python, Word, Cybersécurité. 45€/h individuel, éligible CPF. {context[:200]}..."
+                else:
+                    return context[:400] + "..."
+            
+        except Exception as e:
+            logger.warning(f"RAG search failed: {e}")
     
-    # Company info
-    elif any(word in message_lower for word in ["netz", "entreprise", "société", "qui êtes"]):
-        return f"NETZ Informatique est une entreprise de services informatiques basée à {NETZ_KB['company']['location']}. Fondée par {NETZ_KB['company']['founder']}, nous proposons du dépannage, des formations certifiées QUALIOPI, de la maintenance et du développement web. Contactez-nous au {NETZ_KB['company']['contact']['phone']}."
-    
-    # Pricing
-    elif any(word in message_lower for word in ["tarif", "prix", "coût", "combien"]):
-        return f"Nos tarifs NETZ Informatique : Diagnostic GRATUIT, Dépannage {NETZ_KB['services']['depannage']['pricing']}, Formations {NETZ_KB['services']['formation']['pricing']}, Maintenance {NETZ_KB['services']['maintenance']['pricing']}. Devis toujours gratuit !"
-    
-    # Training/Formation
-    elif any(word in message_lower for word in ["formation", "cours", "apprentissage", "qualiopi", "cpf"]):
-        subjects = ", ".join(NETZ_KB['services']['formation']['subjects'])
-        return f"NETZ propose des formations professionnelles certifiées QUALIOPI : {subjects}. {NETZ_KB['services']['formation']['certification']}. Tarifs : {NETZ_KB['services']['formation']['pricing']}."
-    
-    # Contact
-    elif any(word in message_lower for word in ["contact", "téléphone", "email", "joindre", "appeler"]):
-        contact = NETZ_KB['company']['contact']
-        return f"Contactez NETZ Informatique : 📱 {contact['phone']}, 📧 {contact['email']}, 🌐 {contact['website']}. Horaires : {contact['hours']}. Réponse rapide garantie !"
-    
-    # Technical issues
-    elif any(word in message_lower for word in ["lent", "problème", "panne", "virus", "réparation", "dépannage"]):
-        if "lent" in message_lower:
-            return "PC lent ? Causes possibles : programmes au démarrage, malwares, disque plein. NETZ vous propose : diagnostic GRATUIT, nettoyage système (35€), remplacement par SSD très efficace. Intervention rapide au 07 67 74 49 03 !"
-        elif "virus" in message_lower:
-            return "Problème de virus ? Pas de panique ! NETZ intervient rapidement : suppression malwares, récupération données, installation protection efficace. Tarif : 55€/h. Appelez le 07 67 74 49 03 pour une prise en charge immédiate."
-        else:
-            return f"Pour tous vos problèmes informatiques, NETZ Informatique vous aide : {', '.join(NETZ_KB['services']['depannage']['features'])}. Tarif : {NETZ_KB['services']['depannage']['pricing']}. Contact : 07 67 74 49 03."
-    
-    # Location/Zone
-    elif any(word in message_lower for word in ["où", "zone", "déplacement", "intervention", "haguenau"]):
-        return f"NETZ Informatique est basé à {NETZ_KB['company']['location']}. Zone d'intervention : {NETZ_KB['faq']['zone_intervention']}. Télémaintenance possible dans toute la France."
-    
-    # Business services
-    elif any(word in message_lower for word in ["entreprise", "professionnel", "maintenance", "contrat"]):
-        return f"Pour les entreprises, NETZ propose : maintenance préventive ({NETZ_KB['services']['maintenance']['pricing']}), support prioritaire, formations sur site, développement applications métier. Devis personnalisé gratuit."
-    
-    # Financial/Revenue queries
-    elif any(word in message_lower for word in ["chiffre", "affaires", "ca", "revenus", "finances", "octobre", "mois"]) or "d'affaires" in message_lower:
-        return f"Voici les données financières NETZ Informatique 2025 : Octobre 2025 : 41,558.85€ HT. Total Jan-Oct : 119,386.85€ HT. Projection annuelle : 143,264.22€ HT. Répartition : Excel (30%), Bilans compétences (24%), Python (16%), AutoCAD (11%). Croissance solide avec 2,734 clients actifs !"
-    
-    # General/Fallback
-    else:
-        return f"Merci pour votre question ! NETZ Informatique vous accompagne pour tous vos besoins informatiques : dépannage, formations QUALIOPI, maintenance, développement web. Diagnostic et devis GRATUITS. Contactez-nous au 07 67 74 49 03 ou contact@netzinformatique.fr"
+    # Fallback to basic response
+    return "Merci pour votre question ! NETZ Informatique vous accompagne : dépannage, formations QUALIOPI, maintenance. Contact : 07 67 74 49 03, contact@netzinformatique.fr"
 
 @app.on_event("startup")
 async def startup_event():
@@ -294,22 +286,9 @@ async def startup_event():
     # Initialize RAG system if available
     if RAG_AVAILABLE:
         try:
+            # Use the optimized RAG system (already loaded with improved knowledge)
             rag_system = LightweightRAG()
-            
-            # Add NETZ knowledge to RAG
-            for category, items in NETZ_KB.items():
-                if isinstance(items, dict):
-                    for key, value in items.items():
-                        content = f"{category} - {key}: {json.dumps(value, ensure_ascii=False)}"
-                        rag_system.add_document(
-                            content=content,
-                            title=f"NETZ {category}/{key}",
-                            source="knowledge_base",
-                            doc_type="netz_info",
-                            metadata={"category": category, "key": key, "importance": "5"}
-                        )
-            
-            logger.info("✅ RAG system initialized with NETZ knowledge")
+            logger.info("✅ RAG system initialized with optimized knowledge base")
         except Exception as e:
             logger.warning(f"⚠️ RAG system initialization failed: {str(e)}")
             rag_system = None
@@ -357,23 +336,36 @@ async def chat_endpoint(request: ChatRequest):
         # If Ollama is available, enhance with AI
         if OLLAMA_AVAILABLE:
             try:
-                # Prepare enhanced prompt
-                enhanced_prompt = f"""NETZ Informatique AI Assistant. Services: Dépannage (55€/h), Formations QUALIOPI (45€/h), Maintenance (39€/mois). Contact: 07 67 74 49 03. CA Oct 2025: 41,558.85€ HT.
+                # Prepare enhanced prompt with RAG context
+                enhanced_prompt = f"""Tu es l'assistant IA de NETZ Informatique, entreprise informatique située à Haguenau (67500).
 
-Q: {user_message}
-Réponse: {netz_response}
+INFORMATION SOCIÉTÉ:
+- Nom: NETZ Informatique  
+- Dirigeant: Mikail Lekesiz
+- Téléphone: 07 67 74 49 03
+- Email: contact@netzinformatique.fr
+- Adresse: 1A Route de Schweighouse, 67500 Haguenau
 
-Réponds en français, professionnel, précis. Utilise les données exactes fournies."""
+SERVICES & TARIFS 2025:
+- Dépannage: 55€/h particuliers, 75€/h entreprises (diagnostic GRATUIT)
+- Formations QUALIOPI: 45€/h (Excel, Python, Cybersécurité)
+- Maintenance: 39€/mois particuliers, 69€/mois entreprises
 
-                # Call Ollama
+Question client: {user_message}
+Contexte RAG: {netz_response}
+
+IMPORTANT: Tu DOIS toujours te présenter comme l'assistant de NETZ Informatique dans tes réponses. Même pour un simple "Bonjour", présente brièvement NETZ. Utilise les données exactes ci-dessus."""
+
+                # Call Ollama with optimized settings
                 response = ollama.generate(
                     model='mistral',
                     prompt=enhanced_prompt,
                     options={
-                        'temperature': 0.3,  # More focused
-                        'num_predict': 150,  # Shorter responses
-                        'top_p': 0.8,       # More deterministic
-                        'stop': ['\n\n', '---', 'Q:']  # Stop tokens
+                        'temperature': 0.1,  # Very focused for consistent info
+                        'num_predict': 500,  # Longer responses for complete info
+                        'top_p': 0.9,       # Balanced creativity
+                        'repeat_penalty': 1.1,  # Avoid repetition
+                        'stop': []  # No stop tokens - let complete response
                     }
                 )
                 
@@ -685,6 +677,11 @@ def get_analytics_summary(period_days: int = 7):
         }
     }
 
+@app.get("/api/analytics")
+async def get_analytics_data(admin_user: Dict = Depends(get_admin_user)):
+    """Get basic analytics data (admin only)"""
+    return get_analytics_summary(7)  # Default 7 days
+
 @app.get("/api/analytics/summary")
 async def get_analytics_summary_endpoint(
     period: int = 7,
@@ -983,6 +980,16 @@ add_user_management_routes(app)
 
 # Add enhanced admin dashboard routes to the app  
 add_admin_dashboard_routes(app)
+
+# Add AI training routes to the app
+if AI_TRAINING_AVAILABLE:
+    add_training_routes(app)
+    logger.info("🧠 AI Training API routes added")
+
+# Add integrations API routes
+if INTEGRATIONS_API_AVAILABLE:
+    add_integrations_routes(app, get_admin_user=get_admin_user)
+    logger.info("🔌 Integrations API routes added (Google Drive, Gmail, PennyLane, Wedof)")
 
 if __name__ == "__main__":
     import uvicorn
